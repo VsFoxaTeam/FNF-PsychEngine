@@ -23,40 +23,46 @@ typedef LuaTweenOptions = {
 }
 
 class LuaUtils {
-    inline public static function isLuaTable(value:Any){
+	inline public static function isLuaTable(value:Any) {
 		return (Type.getClass({}) == Type.getClass(value));
-    }
-    inline public static function isMap(value:Dynamic){
-		return Std.isOfType(value, haxe.Constraints.IMap);
-    }
-    public static function fromTable(table:Any = null):Map<Any, Dynamic>{
-        var tableFields:Array<Any> = Reflect.fields(table);
-        var returnedMap:Map<Any, Dynamic> = new Map<Any, Dynamic>();
+	}
 
-        for (field in tableFields){
-            var value:Dynamic = Reflect.field(table, Std.string(field));
-            returnedMap.set(field, (isLuaTable(value) ? fromTable(value) : value));
-        }
-        return returnedMap;
-    }
-    public static function toTable<K, V>(map:Map<K, V>):Dynamic{
-        var table:Any = {};
-        for (key in map.keys()){
-            var value:Dynamic = map.get(key);
-            Reflect.setField(table, Std.string(key), (isMap(value) ? toTable(value) : value));
-        }
-        return table;
-    }
-    inline public static function fromLua(value:Any = null){
-        if (isLuaTable(value)){ // cast value into Map<Any, Dynamic>
-            var map:Map<Any, Dynamic> = fromTable(value);
-            return map;
-        }
-        return value;
-    }
+	inline public static function isMap(value:Dynamic) {
+		return Std.isOfType(value, haxe.Constraints.IMap);
+	}
+
+	public static function fromTable(table:Any = null):Map<Any, Dynamic> {
+		var tableFields:Array<Any> = Reflect.fields(table);
+		var returnedMap:Map<Any, Dynamic> = new Map<Any, Dynamic>();
+
+		for (field in tableFields) {
+			var value:Dynamic = Reflect.field(table, Std.string(field));
+			returnedMap.set(field, (isLuaTable(value) ? fromTable(value) : value));
+		}
+		return returnedMap;
+	}
+
+	public static function toTable<K, V>(map:Map<K, V>):Dynamic {
+		var table:Any = {};
+		for (key in map.keys()) {
+			var value:Dynamic = map.get(key);
+			Reflect.setField(table, Std.string(key), (isMap(value) ? toTable(value) : value));
+		}
+		return table;
+	}
+
+	inline public static function fromLua(value:Any = null) {
+		if (isLuaTable(value)) { // cast value into Map<Any, Dynamic>
+			var map:Map<Any, Dynamic> = fromTable(value);
+			return map;
+		}
+		return value;
+	}
+
 	inline public static function toLua(value:Any = null) {
 		return (isMap(value) ? toTable(value) : value);
 	}
+
 	public static function getLuaTween(options:Dynamic) {
 		return {
 			type: getTweenTypeByString(options.type),
@@ -70,7 +76,7 @@ class LuaUtils {
 	}
 
 	public static function setVarInArray(instance:Dynamic, variable:String, value:Dynamic):Any {
-        value = fromLua(value);
+		value = fromLua(value);
 		var splitProps:Array<String> = variable.split('[');
 		if (splitProps.length > 1) {
 			var target:Dynamic = null;
@@ -131,7 +137,7 @@ class LuaUtils {
 	}
 
 	public static function setGroupStuff(leArray:Dynamic, variable:String, value:Dynamic) {
-        value = fromLua(value)
+		value = fromLua(value)
 		var killMe:Array<String> = variable.split('.');
 		if (killMe.length > 1) {
 			var coverMeInPiss:Dynamic = Reflect.getProperty(leArray, killMe[0]);
