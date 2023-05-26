@@ -84,9 +84,26 @@ class HScript
 			return false;
 		});
 	}
+	
+	public static function getImports(code:String):Array<String> {
+	    var imports:Array<String> = [];
+	    var re:EReg = ~/^(?:(?!"|')(?:[^"']|\.(?!"|'))*?)import\s+([\w.]+);$/m;
+	    while (re.match(code)) {
+	        imports.push(re.matched(1));
+	        code = re.matchedRight();
+	    }
+	    return imports;
+	}
 
 	public function execute(codeToRun:String, ?funcToRun:String = null, ?funcArgs:Array<Dynamic>):Dynamic
 	{
+		// imports handling
+		for (imports in getImports(codeToRun)){
+			var splitted:Array<String> = imports.split('.');
+			interp.variables.set(splitted[splitted.length - 1], Type.resolveClass(imports));
+		}
+        	codeToRun = ~/^(?:(?!"|')(?:[^"']|\.(?!"|'))*?)import\s+([\w.]+);$/mg.replace(codeToRun, ""); // delete all imports
+		
 		@:privateAccess
 		HScript.parser.line = 1;
 		HScript.parser.allowTypes = true;
@@ -104,6 +121,8 @@ class HScript
 
 	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>)
 	{
+		for (i in 0...funcArgs.length)
+		    funcArgs[i] = LuaUtils.fromLua(funcArgs[i]);
 		if(funcToRun != null)
 		{
 			//trace('Executing $funcToRun');
