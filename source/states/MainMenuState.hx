@@ -44,10 +44,8 @@ class MainMenuState extends MusicBeatState
 		#end
 		WeekData.loadTheFirstEnabledMod();
 
-		#if desktop
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
-		#end
 
 		camGame = new FlxCamera();
 		camAchievement = new FlxCamera();
